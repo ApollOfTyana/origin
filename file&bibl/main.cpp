@@ -8,6 +8,9 @@
 using namespace std;
 
 int main(int argc, char** argv){
+
+    cout << "\t\t\tЗАДАНИЕ №3\n\n" <<endl;
+    
     Figure fi;
     fi.print_info();
     
@@ -35,7 +38,9 @@ int main(int argc, char** argv){
     p.print_info();
     Rhombus ro;
     ro.print_info();
-        
+
+    cout << "\t\t\tЗАДАНИЕ №1\n\n" <<endl;
+       
     int a = 0;
     int b = 0;
 
@@ -69,7 +74,9 @@ int main(int argc, char** argv){
     default:
         break;
     }
-    
+
+    cout << "\t\t\tЗАДАНИЕ №2\n\n" <<endl;
+
     std::cout << "Вы хотите указать начальное значение счётчика? Введите да или нет: ";
     std::string answer;
     cin >> answer;
