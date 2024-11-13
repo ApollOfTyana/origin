@@ -36,75 +36,75 @@ int main(int argc, char** argv){
     Rhombus ro;
     ro.print_info();
         
-    // int a = 0;
-    // int b = 0;
+    int a = 0;
+    int b = 0;
 
-    // int chooce=0;
+    int chooce=0;
 
-    // cout << "Введите первое число:";
-    // cin >> a;
-    //  cout << "Введите второе число:";
-    // cin >> b;
-    // cout << "Выберите операцию(1 - сложение, 2 вычетание, 3 - умножение, 4 - деление, 5 - возведение в степень): ";
-    // cin >> chooce;
+    cout << "Введите первое число:";
+    cin >> a;
+     cout << "Введите второе число:";
+    cin >> b;
+    cout << "Выберите операцию(1 - сложение, 2 вычетание, 3 - умножение, 4 - деление, 5 - возведение в степень): ";
+    cin >> chooce;
 
-    // switch (chooce)
-    // {
-    // case 1:
-    //     cout << a << " плюс " << b << " = " << accum(a,b) << endl;
-    //     break;
-    // case 2:
-    //     cout << a << " минус " << b << " = " << subtraction(a,b) << endl;
-    //     break;
-    // case 3:
-    //     cout << a << " умножить на " << b << " = " << multiplication(a,b) << endl;
-    //     break;
-    // case 4:
-    //     cout << a << " раздеть на " << b << " = " << division(a,b) << endl;
-    //     break;
-    // case 5:
-    //     cout << a << " в степени " << b << " = " << exp(a,b) << endl;
-    //     break;
+    switch (chooce)
+    {
+    case 1:
+        cout << a << " плюс " << b << " = " << accum(a,b) << endl;
+        break;
+    case 2:
+        cout << a << " минус " << b << " = " << subtraction(a,b) << endl;
+        break;
+    case 3:
+        cout << a << " умножить на " << b << " = " << multiplication(a,b) << endl;
+        break;
+    case 4:
+        cout << a << " раздеть на " << b << " = " << division(a,b) << endl;
+        break;
+    case 5:
+        cout << a << " в степени " << b << " = " << exp(a,b) << endl;
+        break;
     
-    // default:
-    //     break;
-    // }
+    default:
+        break;
+    }
     
-    // std::cout << "Вы хотите указать начальное значение счётчика? Введите да или нет: ";
-    // std::string answer;
-    // cin >> answer;
+    std::cout << "Вы хотите указать начальное значение счётчика? Введите да или нет: ";
+    std::string answer;
+    cin >> answer;
 
-    // Counter s;
-    // if (answer == "да") {
-    //     cout << "Введите начальное значение счётчика: ";
-    //     int value;
-    //     cin >> value;
-    //     s = Counter(value);
-    // }
+    Counter s;
+    if (answer == "да") {
+        cout << "Введите начальное значение счётчика: ";
+        int value;
+        cin >> value;
+        s = Counter(value);
+    }
 
-    // char cmd;
-    // do {
-    //     std::cout << "\nВведите команду ('+', '-', '=' или 'x'): ";
-    //     std::cin >> cmd;
+    char cmd;
+    do {
+        std::cout << "\nВведите команду ('+', '-', '=' или 'x'): ";
+        std::cin >> cmd;
 
-    //     switch(cmd) {
-    //         case '+':
-    //             s.up();
-    //             break;
-    //         case '-':
-    //             s.dwn();
-    //             break;
-    //         case '=':
-    //             cout << s.getValue() << endl;
-    //             break;
-    //         case 'x':
-    //             cout << "До свидания!" << endl;
-    //             break;
-    //         default:
-    //             cout << "Неверная команда." << std::endl;
-    //             break;
-    //     }
-    // } while (cmd != 'x');
+        switch(cmd) {
+            case '+':
+                s.up();
+                break;
+            case '-':
+                s.dwn();
+                break;
+            case '=':
+                cout << s.getValue() << endl;
+                break;
+            case 'x':
+                cout << "До свидания!" << endl;
+                break;
+            default:
+                cout << "Неверная команда." << std::endl;
+                break;
+        }
+    } while (cmd != 'x');
     
     return 0;
 };
