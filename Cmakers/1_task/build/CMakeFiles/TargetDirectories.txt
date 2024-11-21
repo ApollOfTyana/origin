@@ -1,0 +1,7 @@
+/Users/tanyko/Desktop/11/build/CMakeFiles/cmake_program.dir
+/Users/tanyko/Desktop/11/build/CMakeFiles/edit_cache.dir
+/Users/tanyko/Desktop/11/build/CMakeFiles/rebuild_cache.dir
+/Users/tanyko/Desktop/11/build/CMakeFiles/list_install_components.dir
+/Users/tanyko/Desktop/11/build/CMakeFiles/install.dir
+/Users/tanyko/Desktop/11/build/CMakeFiles/install/local.dir
+/Users/tanyko/Desktop/11/build/CMakeFiles/install/strip.dir

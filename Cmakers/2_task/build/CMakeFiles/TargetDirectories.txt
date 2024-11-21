@@ -1,0 +1,7 @@
+/Users/tanyko/Desktop/file&bibl/build/CMakeFiles/cmake_figures.dir
+/Users/tanyko/Desktop/file&bibl/build/CMakeFiles/edit_cache.dir
+/Users/tanyko/Desktop/file&bibl/build/CMakeFiles/rebuild_cache.dir
+/Users/tanyko/Desktop/file&bibl/build/CMakeFiles/list_install_components.dir
+/Users/tanyko/Desktop/file&bibl/build/CMakeFiles/install.dir
+/Users/tanyko/Desktop/file&bibl/build/CMakeFiles/install/local.dir
+/Users/tanyko/Desktop/file&bibl/build/CMakeFiles/install/strip.dir
