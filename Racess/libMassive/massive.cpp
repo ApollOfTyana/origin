@@ -1,3 +1,4 @@
+#include <string>
 #include "massive.h"
 
 void DynamicMassive:: print_two_dim_array() {

@@ -11,7 +11,7 @@
 // /////////////////////////////////////GroundTransport////////////////////////////////////////////
 
     double GroundTransport::get_speed() const { return speed; };  
-    double GroundTransport:: calculate_time_for_distance(int spead) { return distance/spead; };
+    double GroundTransport:: calculate_time_for_distance(int spead) {return distance/spead; };
 
 
     DynamicMassive Camel:: create_rest_way()
@@ -20,20 +20,25 @@
         double time_only_way = calculate_time_for_distance(get_speed());
         count_rest = static_cast<int>(time_only_way/time_to_rest);
         long_rest = DynamicMassive(1,count_rest);
-        for(int i=1;i<=count_rest;i++)
+        
+        int i=-1;
+        
+        while((i+2)*(get_speed()*time_to_rest)<distance)
         {
-            if(i==1)
+            i++;
+
+            if(i==0)
             {
-                long_rest.set_value_two_dim_array(0,i-1,time_only_way+5.0);
-            }
-            else if(i>1)
-            {   
-                double last_time=long_rest.get_value_two_dim_array(0,i-2);
-                long_rest.set_value_two_dim_array(0,i-1,last_time+8.0);
+                long_rest.set_value_two_dim_array(0,i,time_only_way+5.0);
             }
             else
-                ;
-        }
+            {  
+                double last_time=long_rest.get_value_two_dim_array(0,i-1);
+                long_rest.set_value_two_dim_array(0,i,last_time+8.0);
+            }
+        };
+
+        long_rest.set_value_two_dim_array(0,count_rest-1,long_rest.get_value_two_dim_array(0,i));
 
         return long_rest;
     };
@@ -44,25 +49,31 @@
         double time_only_way = calculate_time_for_distance(get_speed());
         count_rest = static_cast<int>(time_only_way/time_to_rest);
         long_rest = DynamicMassive(1,count_rest);
-        for(int i=1;i<=count_rest;i++)
+        
+        int i=-1;
+        
+        while((i+2)*(get_speed()*time_to_rest)<distance)
         {
-            if(i==1)
+            i++;
+
+            if(i==0)
             {
-                long_rest.set_value_two_dim_array(0,i-1,time_only_way+5.0);
+                long_rest.set_value_two_dim_array(0,i,time_only_way+5.0);
+
             }
-            else if(i==2)
+            else if(i==1)
             {   
-                double last_time=long_rest.get_value_two_dim_array(0,i-2);
-                long_rest.set_value_two_dim_array(0,i-1,last_time+6.5);
-            }
-            else if(i>2)
-            {   
-                double last_time=long_rest.get_value_two_dim_array(0,i-2);
-                long_rest.set_value_two_dim_array(0,i-1,last_time+8.0);
+                double last_time=long_rest.get_value_two_dim_array(0,i-1);
+                long_rest.set_value_two_dim_array(0,i,last_time+6.5);
             }
             else
-                ;
-        }
+            {   
+                double last_time=long_rest.get_value_two_dim_array(0,i-1);
+                long_rest.set_value_two_dim_array(0,i,last_time+8.0);
+            }
+        };
+
+        long_rest.set_value_two_dim_array(0,count_rest-1,long_rest.get_value_two_dim_array(0,i));
 
         return long_rest;
     };
@@ -73,20 +84,25 @@
         double time_only_way = calculate_time_for_distance(get_speed());
         count_rest = static_cast<int>(time_only_way/time_to_rest);
         long_rest = DynamicMassive(1,count_rest);
-        for(int i=1;i<=count_rest;i++)
+        
+        int i=-1;
+        
+        while((i+2)*(get_speed()*time_to_rest)<distance)
         {
-            if(i==1)
+            i++;
+
+            if(i==0)
             {
-                long_rest.set_value_two_dim_array(0,i-1,time_only_way+10.0);
-            }
-            else if(i>1)
-            {   
-                double last_time=long_rest.get_value_two_dim_array(0,i-2);
-                long_rest.set_value_two_dim_array(0,i-1,last_time+5.0);
+                long_rest.set_value_two_dim_array(0,i,time_only_way+10.0);
             }
             else
-                ;
-        }
+            {   
+                double last_time=long_rest.get_value_two_dim_array(0,i-1);
+                long_rest.set_value_two_dim_array(0,i,last_time+5.0);
+            }
+        };
+        
+        long_rest.set_value_two_dim_array(0,count_rest-1,long_rest.get_value_two_dim_array(0,i));
 
         return long_rest;
     };
@@ -97,20 +113,26 @@
         double time_only_way = calculate_time_for_distance(get_speed());
         count_rest = static_cast<int>(time_only_way/time_to_rest);
         long_rest = DynamicMassive(1,count_rest);
-        for(int i=1;i<=count_rest;i++)
+        
+        int i=-1;
+        
+        while((i+2)*(get_speed()*time_to_rest)<distance)
         {
-            if(i==1)
+            i++;
+
+            if(i==0)
             {
-                long_rest.set_value_two_dim_array(0,i-1,time_only_way+2.0);
-            }
-            else if(i>1)
-            {   
-                double last_time=long_rest.get_value_two_dim_array(0,i-2);
-                long_rest.set_value_two_dim_array(0,i-1,last_time+2.0);
+                long_rest.set_value_two_dim_array(0,i,time_only_way+2.0);
             }
             else
-                ;
-        }
+            {   
+                double last_time=long_rest.get_value_two_dim_array(0,i-1);
+                long_rest.set_value_two_dim_array(0,i,last_time+2.0);
+            }
+        };
+
+        long_rest.set_value_two_dim_array(0,count_rest-1,long_rest.get_value_two_dim_array(0,i));
+
         return long_rest;
     };
 
@@ -134,23 +156,33 @@
     };
 
        
-    double CarpetPlane:: calculateDistanceReductionFactor()
+    double CarpetPlane:: calculateDistanceReductionFactor(int dist)
     {
-        if (distance < 1000) return 1.0;
-        else if (distance < 5000) return 0.97;
-        else if (distance < 10000) return 0.9;
+        distance=dist;
+
+        if (dist < 1000) return 1.0;
+        else if (dist < 5000) return 0.97;
+        else if (dist < 10000) return 0.9;
         else return 0.95;
     };
    
-    double Eegl:: calculateDistanceReductionFactor() {
+    double Eegl:: calculateDistanceReductionFactor(int dist) {
+        
+        distance=dist;
+        
         return 0.94;
     };
     
-    double Metla:: calculateDistanceReductionFactor() {
-        if(distance<1000)
-            return 1;
-        else
+    double Metla:: calculateDistanceReductionFactor(int dist) {
+        
+        distance=dist;
+
+        if(dist<1000)
         {
-            return 1-(trunc(round(((distance/1000))*10)/10)/100) ;
+            return 1;
+        }
+        else
+        {   
+            return 1-(trunc(round(((dist/1000))*10)/10)/100);
         }
     };

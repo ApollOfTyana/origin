@@ -3,6 +3,12 @@
 #include <algorithm>
 #include "transport.h"
 
+struct Result
+{
+    std::string nameTransport;
+    double Racetime;
+};
+
 class Race {
     public:
         Transport* Tr;
@@ -15,6 +21,12 @@ class Race {
         ~Race()
         {
             free(Tr);
+
+            for (int r = 0; r < rows; r++)
+            {
+                free(result_race[r]);
+            }
+                free(result_race);
         };
         
         void startRace();
@@ -27,6 +39,10 @@ class Race {
         
         
     private:
+        Result** result_race;
+        int rows;
+        int cols;
+
         std::string in_race = "";
         std::string count_type;
         int type_race=0;
@@ -39,4 +55,8 @@ class Race {
         void registrate(Transport* first,int place);
         void registering();
         void output_result();
+
+        Result** create_ResultArray(int rows, int cols);
+        Result get_value_ResultArray(int row, int col);
+        void set_value_ResultArray(int row, int col, Result value);
 };

@@ -104,39 +104,38 @@ class AirTransport : public Transport{
         DynamicMassive create_rest_way() override;
         double calculate_time_for_distance(int spead) override;
 
-        virtual double calculateDistanceReductionFactor() = 0; 
+        virtual double calculateDistanceReductionFactor(int dist) = 0;
+         
 };
 
 class CarpetPlane : public AirTransport {
     public:
-        CarpetPlane(int dist) : AirTransport(10, calculateDistanceReductionFactor()){
-            distance = dist;
+        CarpetPlane(int dist) : AirTransport(10, calculateDistanceReductionFactor(dist)){
             nameTransport = "Ковер-самолет";
             typeTransport = "Air";
             long_rest = create_rest_way();
         }
     private:        
-        double calculateDistanceReductionFactor() override;
+        double calculateDistanceReductionFactor(int dist) override;
 };
 class Eegl : public AirTransport {
     public:
-        Eegl(int dist) : AirTransport(8, calculateDistanceReductionFactor()){
-            distance = dist;
+        Eegl(int dist) : AirTransport(8, calculateDistanceReductionFactor(dist)){
             nameTransport = "Орел";
             typeTransport = "Air";
             long_rest = create_rest_way();
         }
     private:        
-        double calculateDistanceReductionFactor() override;
+        double calculateDistanceReductionFactor(int dist) override;
 };
 class Metla : public AirTransport {
     public:
-        Metla(int dist) : AirTransport(20, calculateDistanceReductionFactor()){
-            distance = dist;
+        Metla(int dist) : AirTransport(20, calculateDistanceReductionFactor(dist)){
+            distance=dist;
             nameTransport = "Метла";
             typeTransport = "Air";
             long_rest = create_rest_way();
         }
     private:        
-        double calculateDistanceReductionFactor() override;
+        double calculateDistanceReductionFactor(int dist) override;
 };

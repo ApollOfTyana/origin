@@ -21,7 +21,7 @@
 
     void Race:: set_type_race(int type)
     {
-        if(type >= 1 and type <= 3)
+        if(type >= 1 && type <= 3)
             type_race = type ;
         else
             std::cout << "\nВыберите что-то одно из трех вариантов!\n" << std::endl;
@@ -38,11 +38,45 @@
         return mass;
     };
     
+//Result structur manipulation
+    Result** Race::create_ResultArray(int rows, int cols)
+{
+    Result** mass = static_cast<Result**>(calloc(rows, sizeof(Result*)));
+    for (int i = 0; i < rows; i++)
+    {
+        mass[i] = static_cast<Result*>(calloc(cols, sizeof(Result)));
+    }
+    this->rows = rows;
+    this->cols = cols;
+    this->result_race = mass;
+    return mass;
+}
+    
+    Result Race::get_value_ResultArray(int row, int col)
+    {
+        if (row >= 0 && row < rows && col >= 0 && col < cols)
+        {
+            return result_race[row][col];
+        }
+        else
+        {
+            return {"", 0.0}; // Возвращаем пустую структуру, если индексы выходят за пределы массива
+        }
+    };
+    
+    void Race::set_value_ResultArray(int row, int col, Result value)
+    {
+        if (row >= 0 && row < rows && col >= 0 && col < cols)
+        {
+            result_race[row][col] = value;
+        }
+    }
+// //////////////////////////////////////////////////////////////////////////////////////////////////////            
+
     void Race:: set_value_one_dim_array(Transport *mass,Transport* in, int place)
     {
         *(mass + place) = *in;
     };
-            
     void Race:: seting_race()
     {
         while(get_type_race()==0)
@@ -278,41 +312,37 @@
 
     void Race:: output_result()
     {
-        struct Result
-        {
-            std::string nameTransport;
-                double Racetime;
-        };
-
-        Result result_race[count_transport];
+        std::cout<<"OK"<<std::endl;
+    // Создаем динамический массив для хранения результатов
+        result_race=create_ResultArray(count_transport, 1); // Один столбец
                 
         for (int id = 0; id < count_transport; ++id)
         {
-            result_race[id] = {Tr[id].nameTransport, Tr[id].get_race_time()};
+            Result newResult = {Tr[id].nameTransport, Tr[id].get_race_time()};
+            set_value_ResultArray(id, 0, newResult);
         };
 
         bool swapped;
-        
         do {
             swapped = false;
             
             for (int i = 0; i < count_transport - 1; ++i)
             {
-                if (result_race[i].Racetime > result_race[i + 1].Racetime)
+                if (get_value_ResultArray(i,0).Racetime > get_value_ResultArray(i+1,0).Racetime)
                 {
                     // Используем собственную функцию обмена
-                    Result temp = result_race[i];
-                    result_race[i] = result_race[i + 1];
-                    result_race[i + 1] = temp;
+                    Result temp = get_value_ResultArray(i,0);
+                    set_value_ResultArray(i, 0, get_value_ResultArray(i+1,0));
+                    set_value_ResultArray(i+1, 0, temp);
                     swapped = true;
                 }
             };
         } while (swapped);
-
         std::cout << "Результат гонки:\n";
 
         for (int id = 0; id < count_transport; ++id)
         {
-            std::cout << id+1 << ". " << result_race[id].nameTransport << ". Время: " << result_race[id].Racetime << std::endl;
+            std::cout << id+1 << ". " << get_value_ResultArray(id,0).nameTransport << ". Время: " << get_value_ResultArray(id,0).Racetime << std::endl;
         };
+
     };
