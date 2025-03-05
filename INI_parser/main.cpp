@@ -2,134 +2,180 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <map>
-#include <vector>
-#include <stdexcept>
+#include <unordered_map>
 #include <algorithm>
 #include <cctype>
+#include <vector>
+
 
 class ini_parser {
-private:
-    std::map<std::string, std::map<std::string, std::string>> data;
+    std::unordered_map<std::string, 
+        std::unordered_map<std::string, std::string>> data;
 
-    void trim(std::string &str) { //удаляем пустые места
+    // удаление пробелов и комментариев
+    static std::string clean_line(std::string line) {
+        // Удаляем комментарии
+        size_t comment_pos = line.find_first_of(";#");
+        if(comment_pos != std::string::npos) {
+            line.erase(comment_pos);
+        }
         
-        str.erase(str.begin(), std::find_if(str.begin(), str.end(), [](unsigned char ch) {
-            return !std::isspace(ch);
-        }));
-        str.erase(std::find_if(str.rbegin(), str.rend(), [](unsigned char ch) {
-            return !std::isspace(ch);
-        }).base(), str.end());
+        // remove пробелы в начале и конце
+        auto not_space = [](unsigned char c) { return !std::isspace(c); };
+        line.erase(line.begin(), std::find_if(line.begin(), line.end(), not_space));
+        line.erase(std::find_if(line.rbegin(), line.rend(), not_space).base(), line.end());
+        
+        return line;
     }
 
-    void parse_line(const std::string& line, std::string& current_section) {
+    //  кавычки в значениях ?
+    static void process_quotes(std::string& value) {
+        if(value.size() >= 2 && 
+           ((value.front() == '"' && value.back() == '"') ||
+            (value.front() == '\'' && value.back() == '\''))) {
+            value = value.substr(1, value.size()-2);
+        }
+    }
 
-        if (line.empty() || line[0] == ';') return; // comments ignore
+public:
+    explicit ini_parser(const std::string& fn) {
+        std::string current_section;
+        std::ifstream file(fn);
+        
+        if(!file.is_open()) {
+            throw std::runtime_error("Can't open file: " + fn);
+        }
 
-        std::string trimmed_line = line;
-        trim(trimmed_line);
+        std::string line;
+        size_t line_number = 0;
+        
+        while(std::getline(file, line)) {
+            line_number++;
+            std::string cleaned = clean_line(line);
+            if(cleaned.empty()) continue;
 
-        // [section]
-        if (trimmed_line[0] == '[' && trimmed_line[trimmed_line.size() - 1] == ']') {
-            std::string section_name = trimmed_line.substr(1, trimmed_line.size() - 2);
-            trim(section_name);
-            current_section = section_name;
-        } else {
-            // key=value
-            size_t pos = trimmed_line.find('=');
-            if (pos == std::string::npos) return;
+            //секции
 
-            std::string key = trimmed_line.substr(0, pos);
-            std::string value = trimmed_line.substr(pos + 1);
+            if(cleaned.front() == '[') {
+                if(cleaned.back() != ']') {
+                    throw std::runtime_error("Invalid section syntax -> line " + 
+                        std::to_string(line_number));
+                }
+                current_section = cleaned.substr(1, cleaned.size()-2);
+                current_section = clean_line(current_section);
+                
+                if(current_section.empty()) {
+                    throw std::runtime_error("Empty section name -> line " + 
+                        std::to_string(line_number));
+                }
+                continue;
+            }
 
-            trim(key);
-            trim(value);
+            // пары ключ и значение
+
+            size_t delim = cleaned.find('=');
+            if(delim == 0 || delim == std::string::npos) {
+                throw std::runtime_error("Invalid key-value syntax -> line " + 
+                    std::to_string(line_number));
+            }
+
+            std::string key = clean_line(cleaned.substr(0, delim));
+            std::string value = clean_line(cleaned.substr(delim+1));
+            
+            process_quotes(value);
+            
+            if(current_section.empty()) {
+                throw std::runtime_error("Value without section -> line " + 
+                    std::to_string(line_number));
+            }
+            
+            if(key.empty()) {
+                throw std::runtime_error("Empty key -> line " + 
+                    std::to_string(line_number));
+            }
 
             data[current_section][key] = value;
         }
     }
 
-public:
-    ini_parser(const std::string &filename) {
-        std::ifstream file(filename);
-        if (!file.is_open()) {
-            throw std::runtime_error("Could't open file: " + filename);
-        }
-
-        std::string line;
-        std::string current_section = "global"; 
-
-        while (std::getline(file, line)) {
-            try {
-                parse_line(line, current_section);
-            } catch (const std::exception& e) {
-                throw std::runtime_error("Error while parsing file: " + std::string(e.what()));
-            }
-        }
-    }
-
     template <typename T>
-    T get_value(const std::string &variable) const {
-        // Разбиваем строку на секцию и переменную
-        size_t pos = variable.find('.');
-        if (pos == std::string::npos) {
-            throw std::invalid_argument("Invalid variable format");
+    T get_value(const std::string& var) const {
+        size_t dot = var.find('.');
+        if(dot == std::string::npos || dot == 0 || dot == var.size()-1) {
+            throw std::invalid_argument("Invalid variable format: '" + var + "'");
         }
-
-        std::string section_name = variable.substr(0, pos);
-        std::string key_name = variable.substr(pos + 1);
-
-        // существование секции и ключа
-        auto section_it = data.find(section_name);
-        if (section_it == data.end()) {
-            throw std::invalid_argument("Section not found: " + section_name);
-        }
-
-        auto key_it = section_it->second.find(key_name);
-        if (key_it == section_it->second.end()) {
-            // Если переменная не найдена, выводим подсказку
-            std::vector<std::string> suggestions;
-            for (const auto& pair : section_it->second) {
-                suggestions.push_back(pair.first);
+        
+        const std::string section = var.substr(0, dot);
+        const std::string key = var.substr(dot+1);
+        
+        try {
+            const auto& section_data = data.at(section);
+            try {
+                const std::string& value = section_data.at(key);
+                
+                if constexpr(std::is_same_v<T, std::string>) {
+                    return value;
+                }
+                else if constexpr(std::is_same_v<T, bool>) {
+                    static const std::unordered_map<std::string, bool> bool_map{
+                        {"true", true},  {"1", true},  {"yes", true},
+                        {"false", false}, {"0", false}, {"no", false}
+                    };
+                    
+                    std::string lower_value;
+                    lower_value.reserve(value.size());
+                    for(char c : value) {
+                        lower_value += static_cast<char>(std::tolower(c));
+                    }
+                    
+                    auto it = bool_map.find(lower_value);
+                    if(it == bool_map.end()) {
+                        throw std::invalid_argument("Invalid boolean value: " + value);
+                    }
+                    return it->second;
+                }
+                else {
+                    std::istringstream iss(value);
+                    // число с плавающей точкой заменяем , на .
+                    if constexpr(std::is_floating_point_v<T>) {
+                        std::string processed = value;
+                        std::replace(processed.begin(), processed.end(), ',', '.');
+                        iss.str(processed);
+                    }
+                    
+                    T result;
+                    iss >> result;
+                    
+                    // оставшиеся symbol ?
+                    if(iss.fail() || iss.peek() != EOF) {
+                        throw std::invalid_argument("Conv failed for value: " + value);
+                    }
+                    return result;
+                }
             }
-            throw std::invalid_argument("Variable not found: " + key_name + ". Possible suggestions: " + join(suggestions, ", "));
+            catch(const std::out_of_range&) {
+                throw std::out_of_range("Key '" + key + "' not found in section '" + section + "'");
+            }
         }
-
-        // Конвертируем значение в тип T
-        std::istringstream ss(key_it->second);
-        T value;
-        ss >> value;
-        if (ss.fail()) {
-            throw std::invalid_argument("Invalid value format for variable: " + key_name);
+        catch(const std::out_of_range&) {
+            throw std::out_of_range("Section '" + section + "' not found");
         }
-        return value;
-    }
-
-private:
-    
-    static std::string join(const std::vector<std::string>& vec, const std::string& delimiter) {
-        std::ostringstream oss;
-        for (size_t i = 0; i < vec.size(); ++i) {
-            if (i != 0) oss << delimiter;
-            oss << vec[i];
-        }
-        return oss.str();
     }
 };
 
 int main() {
     try {
         ini_parser parser("CONF.ini");
-
-       
-        std::string value1 = parser.get_value<std::string>("Section1.var2");
-        std::cout << "Value: " << value1 << std::endl;
-
-        int value2 = parser.get_value<int>("Section2.var1");
-        std::cout << "Value: " << value2 << std::endl;
-
-    } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        
+        std::cout << "String значение: " << parser.get_value<std::string>("Section1.name") << '\n';
+        std::cout << "Double значение: " << parser.get_value<double>("Section1.var1") << '\n';
+        std::cout << "Double значение: " << parser.get_value<double>("Section3.var1") << '\n';
+        std::cout << "Boolean значение: " << std::boolalpha << parser.get_value<bool>("Section2.enabled") << '\n';
+        std::cout << "Boolean значение: " << std::boolalpha << parser.get_value<bool>("Section3.var2") << '\n';
+    } 
+    catch(const std::exception& e) {
+        std::cerr << "Error: " << e.what() << '\n';
+        return 1;
     }
     return 0;
 }

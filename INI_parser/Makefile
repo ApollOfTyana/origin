@@ -1,5 +1,5 @@
 .PHONY: all clean install uninstall run
-CC=clang++ -std=c++14
+CC=clang++ -std=c++20
 CFLAGS=-c -Wall
 LDFLAGS=
 SOURCES=main.cpp
