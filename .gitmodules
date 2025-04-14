@@ -1,0 +1,3 @@
+[submodule "SQL_DB_create/libpqxx"]
+	path = SQL_DB_create/libpqxx
+	url = https://github.com/jtv/libpqxx.git
