@@ -10,9 +10,7 @@ void swap_lock(Data& a, Data& b) {
 }
 
 void swap_scoped(Data& a, Data& b) {
-    std::unique_lock<std::mutex> lock_a(a.mtx, std::defer_lock);
-    std::unique_lock<std::mutex> lock_b(b.mtx, std::defer_lock);
-    std::lock(lock_a, lock_b);
+    std::scoped_lock lock(a.mtx, b.mtx);
     std::swap(a.value, b.value);
 };
 

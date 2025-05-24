@@ -5,6 +5,8 @@
 #include <thread>
 #include <chrono>
 #include <vector>
+#include <random>
+#include <condition_variable>
 
 #include "data.h"
 
@@ -12,6 +14,8 @@ std::atomic<int> client_count(0);
 int max_client;
 
 std::mutex cout_mutex;
+std::condition_variable cv;
+bool start_flag = false;
 
 // /////////////////////////////////////////////TASK I /////////////////////////////////////////////////////////
 
@@ -41,26 +45,68 @@ void operatoros() {
 }
 
 // /////////////////////////////////////////////TASK II /////////////////////////////////////////////////////////
-void worker(int id, size_t total_steps) {
-    auto start = std::chrono::high_resolution_clock::now();
-    std::ostringstream oss;
-    oss << "Thread " << std::setw(2) << id
-        << " [" << std::setw(18) << std::left << "" << "]";
+std::random_device rd;
+std::mt19937 gen(rd());
+std::bernoulli_distribution error_dist(0.05); // 5%
 
+void worker(int id, size_t total_steps, int num_threads) {
+    auto start = std::chrono::high_resolution_clock::now();
     std::string bar(20, ' ');
+    std::vector<bool> errors(20, false);
+
     {
         std::lock_guard<std::mutex> lock(cout_mutex);
-        std::cout << oss.str() << "\r";
+        std::cout << "Thread " << std::setw(2) << id << " [" << std::setw(20) << "" << "]\n";
     }
 
-    for (size_t i = 0; i <= 20; ++i) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        bar[i] = '#';
+    // thread wait 
+    {
+        std::unique_lock<std::mutex> lock(cout_mutex);
+        static int threads_started = 0;
+        ++threads_started;
+        if (threads_started == num_threads) {
+            start_flag = true;
+            cv.notify_all();
+        } else {
+            cv.wait(lock, []{ return start_flag; });
+        }
+    }
+
+    for (size_t step = 0; step <= 20; ++step) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        
+        if (step < 20) {
+            if (error_dist(gen)) {
+                errors[step] = true;
+            }
+            bar[step] = '#';
+        }
+
         {
             std::lock_guard<std::mutex> lock(cout_mutex);
-            std::cout << "\33[2K\r"; // Очистка строки
-            std::cout << "Thread " << std::setw(2) << id
-                      << " [" << std::setw(20) << std::left << bar << "]";
+            // move on string 
+            int lines_up = num_threads - id + 1; // +1 "Task II"
+            std::cout << "\033[" << lines_up << "A"; // move UP
+            
+            // Clear string
+            std::cout << "\r\033[K";
+            
+            // Color format string
+            std::string bar_str;
+            for (size_t i = 0; i < 20; ++i) {
+                if (i < step) {
+                    if (errors[i]) {
+                        bar_str += "\033[31m#\033[0m"; // red color - Err
+                    } else {
+                        bar_str += "#";
+                    }
+                } else {
+                    bar_str += " ";
+                }
+            }
+            
+            std::cout << "Thread " << std::setw(2) << id << " [" << bar_str << "]";
+            std::cout << "\033[" << lines_up << "B"; // move back on pos
             std::cout.flush();
         }
     }
@@ -68,12 +114,17 @@ void worker(int id, size_t total_steps) {
     auto duration = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start).count();
     {
         std::lock_guard<std::mutex> lock(cout_mutex);
-        std::cout << "\33[2K\r";
-        std::cout << "Thread " << std::setw(2) << id
-                  << " [####################] Done in " << duration << "s\n";
+        int lines_up = num_threads - id + 1;
+        std::cout << "\033[" << lines_up << "A"; 
+        std::cout << "\r\033[K"; 
+        std::cout << "Thread " << std::setw(2) << id << " [####################] " 
+                  << duration << "s\n";
+        std::cout << "\033[" << lines_up << "B";
+        std::cout.flush();
     }
 }
 
+// /////////////////////////////////////////////TASK III /////////////////////////////////////////////////////////
 
 int main(int argc, char* argv[]) {
 
@@ -96,12 +147,12 @@ int main(int argc, char* argv[]) {
 
     std::cout << "\t\t Task II" << std::endl;
 
-    const int num_threads = 4;
+    const int num_threads = 14;
     const size_t steps = 100;
 
     std::vector<std::thread> threads;
     for (int i = 0; i < num_threads; ++i) {
-        threads.emplace_back(worker, i + 1, steps);
+        threads.emplace_back(worker, i + 1, steps, num_threads);
     }
 
     for (auto& t : threads) t.join();
